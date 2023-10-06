@@ -266,7 +266,7 @@ class _GroupedListViewState<T, E> extends State<GroupedListView<T, E>> {
   late final ScrollController _controller;
   GlobalKey? _groupHeaderKey;
   List<T> _sortedElements = [];
-  int _topElementIndex = 0;
+  int _topElementIndex = -1;
   RenderBox? _headerBox;
   RenderBox? _listBox;
 
@@ -405,11 +405,11 @@ class _GroupedListViewState<T, E> extends State<GroupedListView<T, E>> {
   /// is not required since the group headers are displayed inside the lists and
   /// do not need to be always in the visible frame.
   void _scrollListener() {
-    if (_controller.position.pixels < 0) {
+    if (_controller.position.pixels <= 0) {
       _topElementIndex = -1;
       _streamController.add(_topElementIndex);
       return;
-    } else if (_controller.position.pixels >= 0 && _topElementIndex == -1) {
+    } else if (_controller.position.pixels > 0 && _topElementIndex == -1) {
       _topElementIndex = 0;
       _streamController.add(_topElementIndex);
     }
