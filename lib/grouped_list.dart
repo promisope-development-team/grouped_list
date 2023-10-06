@@ -322,10 +322,7 @@ class _GroupedListViewState<T, E> extends State<GroupedListView<T, E>> {
       }
       var actualIndex = index ~/ 2;
       if (index == hiddenIndex) {
-        return Opacity(
-          opacity: widget.useStickyGroupSeparators ? 0 : 1,
-          child: _buildGroupSeparator(_sortedElements[actualIndex]),
-        );
+        return _buildGroupSeparator(_sortedElements[actualIndex]);
       }
       if (isSeparator(index)) {
         var curr = widget.groupBy(_sortedElements[actualIndex]);
@@ -370,7 +367,7 @@ class _GroupedListViewState<T, E> extends State<GroupedListView<T, E>> {
             stream: _streamController.stream,
             initialData: _topElementIndex,
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
+              if (snapshot.hasData && snapshot.data != -1) {
                 return _showFixedGroupHeader(snapshot.data!);
               }
               return const SizedBox.shrink();
@@ -408,6 +405,15 @@ class _GroupedListViewState<T, E> extends State<GroupedListView<T, E>> {
   /// is not required since the group headers are displayed inside the lists and
   /// do not need to be always in the visible frame.
   void _scrollListener() {
+    if (_controller.position.pixels < 0) {
+      _topElementIndex = -1;
+      _streamController.add(_topElementIndex);
+      return;
+    } else if (_controller.position.pixels >= 0 && _topElementIndex == -1) {
+      _topElementIndex = 0;
+      _streamController.add(_topElementIndex);
+    }
+
     if (_sortedElements.isEmpty) {
       return;
     }
